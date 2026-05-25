@@ -75,4 +75,4 @@ def prediction_neutral(team_a, team_b):
         print(f"Error: {e}")
 
 # Ejecutamos la prueba del clásico corregido
-prediction_neutral("Brazil", "Morocco")
+prediction_neutral("Argentina", "France")
