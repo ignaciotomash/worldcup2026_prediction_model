@@ -35240,7 +35240,7 @@ date,home_team,away_team,home_score,away_score,neutral,result
 2011-09-28,Brazil,Argentina,2,0,False,0
 2011-09-30,Antigua and Barbuda,Martinique,1,0,False,0
 2011-09-30,Hong Kong,Philippines,3,3,True,1
-2011-09-30,Taiwan,Macau,3,0,True,0
+2011-09-30,Taiwan,Macau,3,0,False,0
 2011-10-01,Ethiopia,Sudan,1,2,False,2
 2011-10-02,Antigua and Barbuda,Martinique,1,2,False,2
 2011-10-02,Hong Kong,Macau,5,1,True,0
@@ -37665,11 +37665,11 @@ date,home_team,away_team,home_score,away_score,neutral,result
 2014-05-10,Vatican City,Monaco,0,2,False,2
 2014-05-10,Palestine,Jordan,1,0,False,0
 2014-05-11,Jersey,Guernsey,1,4,False,2
-2014-05-11,Pakistan,Sri Lanka,3,0,False,0
+2014-05-11,Pakistan,Sri Lanka,3,0,True,0
 2014-05-12,Afghanistan,Kyrgyzstan,1,0,True,0
 2014-05-13,Germany,Poland,0,0,False,1
 2014-05-14,Kuwait,Afghanistan,3,2,False,0
-2014-05-14,Jordan,Pakistan,1,0,False,0
+2014-05-14,Jordan,Pakistan,1,0,True,0
 2014-05-14,Palestine,Sri Lanka,3,0,False,0
 2014-05-16,Kuwait,Kyrgyzstan,2,2,False,1
 2014-05-17,Malawi,Chad,2,0,False,0
@@ -37678,7 +37678,7 @@ date,home_team,away_team,home_score,away_score,neutral,result
 2014-05-17,Netherlands,Ecuador,1,1,False,1
 2014-05-17,São Tomé and Príncipe,Benin,0,2,False,2
 2014-05-17,Somaliland,Sealand,2,2,True,1
-2014-05-17,Sri Lanka,Jordan,0,4,False,2
+2014-05-17,Sri Lanka,Jordan,0,4,True,2
 2014-05-17,Palestine,Pakistan,3,0,False,0
 2014-05-18,Belarus,Iran,0,0,True,1
 2014-05-18,Burundi,Botswana,0,0,False,1
@@ -45124,6 +45124,7 @@ date,home_team,away_team,home_score,away_score,neutral,result
 2022-03-30,Panama,Canada,1,0,False,0
 2022-03-30,Jamaica,Honduras,2,1,False,0
 2022-03-30,Solomon Islands,New Zealand,0,5,True,2
+2022-04-22,Elba Island,Vatican City,4,2,False,0
 2022-04-23,Alderney,Guernsey,0,2,False,2
 2022-04-24,El Salvador,Guatemala,0,4,True,2
 2022-04-27,Mexico,Guatemala,0,0,True,1
@@ -48156,7 +48157,7 @@ date,home_team,away_team,home_score,away_score,neutral,result
 2025-03-20,Mozambique,Uganda,3,1,True,0
 2025-03-20,Malawi,Namibia,0,1,False,2
 2025-03-20,Comoros,Mali,0,3,True,2
-2025-03-20,Lebanon,Timor-Leste,4,0,False,0
+2025-03-20,Lebanon,Timor-Leste,4,0,True,0
 2025-03-21,Belize,Costa Rica,0,7,False,2
 2025-03-21,Guyana,Guatemala,3,2,True,0
 2025-03-21,Bermuda,Honduras,3,5,False,2
@@ -49364,7 +49365,7 @@ date,home_team,away_team,home_score,away_score,neutral,result
 2026-06-06,Myanmar,Guam,6,1,True,0
 2026-06-06,Lithuania,Latvia,1,1,False,1
 2026-06-06,Estonia,Faroe Islands,1,0,False,0
-2026-06-07,Afghanistan,Pakistan,0,2,False,2
+2026-06-07,Afghanistan,Pakistan,0,2,True,2
 2026-06-07,Croatia,Slovenia,2,1,False,0
 2026-06-07,Ecuador,Guatemala,3,0,True,0
 2026-06-07,Greece,Italy,0,1,False,2
@@ -49399,5 +49400,9 @@ date,home_team,away_team,home_score,away_score,neutral,result
 2026-06-09,Togo,Benin,5,1,False,0
 2026-06-09,Liberia,Sierra Leone,3,1,False,0
 2026-06-09,Iraq,Venezuela,0,2,True,2
+2026-06-10,Bolivia,Algeria,0,4,True,2
 2026-06-10,England,Costa Rica,3,0,True,0
-2026-06-10,Portugal,Nigeria,2,1,True,0
+2026-06-10,Portugal,Nigeria,2,1,False,0
+2026-06-10,Afghanistan,Pakistan,0,2,True,2
+2026-06-11,Mexico,South Africa,2,0,False,0
+2026-06-11,South Korea,Czech Republic,2,1,True,0

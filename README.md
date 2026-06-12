@@ -124,6 +124,8 @@ clean_matches_form_rank.csv    football_model.pkl
 * **`wc_simulator.py`**: Es el núcleo lógico del proyecto. Orquesta la lectura de datos, invoca al modelo para los 104 partidos correspondientes y aplica estrictamente el reglamento oficial de la FIFA para avanzar de ronda y ordenar las llaves eliminatorias.
 * **`fixture_mundial.html`**: Es el producto final. Un archivo generado dinámicamente con código HTML y CSS inyectado desde Python. Se sobreescribe en cada ejecución para visualizar el bracket interactivo y las tablas de posiciones sin requerir frameworks web externos.
 
+* **`run_pipeline`**: Realiza el proceso de descarga, preparacion y entrenamiento con un solo script; basicamente es como ejecutar los 3 scripts que lo hacen por separado pero de una sola ejecución. Se puede ejecutar despues de cada partido para poder actualizar el entrenamiento del modelo.
+
 Además...
 * **`macth_pred.py`**: Es el simulador de un partido en particular; se debe ir hasta lo último del archivo para encontrar el método cuyos parametros son los 2 equipos que se desea evaluar en un partido. El resultado se presenta en consola con los datos de PPG (Points per game o puntos por partido) y con el ranking fifa + los puntos de dicho ranking.
 ---

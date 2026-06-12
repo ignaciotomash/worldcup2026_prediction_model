@@ -89,26 +89,60 @@ def prediction_neutral(team_a, team_b):
             forecast = f"Winner: {team_a}"
         else:
             forecast = f"Winner: {team_b}"
-        
-        print(f"\n======================================")
-        print(f"   NEUTRAL MATCH (BINARY GAP): {team_a} vs {team_b}")
-        print(f"======================================")
-        print(f"RANKING FIFA ACTUAL:")
-        print(f" - {team_a}: Puesto #{rank_a} ({points_a:.1f} pts)")
-        print(f" - {team_b}: Puesto #{rank_b} ({points_b:.1f} pts)")
-        print(f"--------------------------------------")
-        print(f"FORECAST: {forecast}")
-        print(f"--------------------------------------")
+
+            # --- NUEVA LÓGICA DE GOLES ---
+        # 1. Cálculo de Goles Esperados (Fuerza ofensiva vs Debilidad defensiva rival)
+        exp_goals_a = (gf_a + ga_b) / 2
+        exp_goals_b = (gf_b + ga_a) / 2
+
+        # 2. Redondeo a números enteros
+        goals_a = int(round(exp_goals_a))
+        goals_b = int(round(exp_goals_b))
+
+        # 3. Corrección estricta: Los goles DEBEN reflejar la predicción del modelo
+        if forecast == f"Winner: {team_a}":
+            if goals_a <= goals_b:
+                goals_a = goals_b + 1
+        elif forecast == f"Winner: {team_b}":
+            if goals_b <= goals_a:
+                goals_b = goals_a + 1
+        else: # Es un empate
+            # Promediamos ambos valores esperados para dar un empate lógico
+            empate_goles = int(round((goals_a + goals_b) / 2))
+            goals_a = empate_goles
+            goals_b = empate_goles
+        # -----------------------------
+
+        print(f"{team_a} vs {team_b}")
+        print(f"==============")
+        print(f"{team_a}: {goals_a}")
+        print(f"{team_b}: {goals_b}")
+        print(f"==============")
         print(f"Probabilities:")
         print(f" - {team_a} Win: {win_a:.2%}")
         print(f" - Draw: {draw:.2%}")
         print(f" - {team_b} Win: {win_b:.2%}")
-        print(f"======================================")
-        print(f"DEBUG - {team_a}: PPG Form: {form_a:.2f} | GF Avg: {gf_a:.2f}")
-        print(f"DEBUG - {team_b}: PPG Form: {form_b:.2f} | GF Avg: {gf_b:.2f}")
-        print(f"======================================")
+        print(f"==============")
+        
+        #print(f"\n======================================")
+        #print(f"   NEUTRAL MATCH (BINARY GAP): {team_a} vs {team_b}")
+        #print(f"======================================")
+        #print(f"RANKING FIFA ACTUAL:")
+        #print(f" - {team_a}: Puesto #{rank_a} ({points_a:.1f} pts)")
+        #print(f" - {team_b}: Puesto #{rank_b} ({points_b:.1f} pts)")
+        ##print(f"--------------------------------------")
+        #print(f"FORECAST: {forecast}")
+        #print(f"--------------------------------------")
+        #print(f"Probabilities:")
+        #print(f" - {team_a} Win: {win_a:.2%}")
+        #print(f" - Draw: {draw:.2%}")
+        #print(f" - {team_b} Win: {win_b:.2%}")
+        #print(f"======================================")
+        #print(f"DEBUG - {team_a}: PPG Form: {form_a:.2f} | GF Avg: {gf_a:.2f}")
+        #print(f"DEBUG - {team_b}: PPG Form: {form_b:.2f} | GF Avg: {gf_b:.2f}")
+        #print(f"======================================")
         
     except Exception as e:
         print(f"Error en ejecución: {e}")
 
-prediction_neutral("Mexico", "South Africa")
+prediction_neutral("Mexico", "Netherlands")

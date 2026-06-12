@@ -44,12 +44,3 @@ df_clean['result'] = df_clean.apply(determine_result, axis=1)
 # Guardar el archivo limpio en la raíz del proyecto
 df_clean.to_csv("clean_matches.csv", index=False)
 print("¡Archivo 'clean_matches.csv' generado con éxito!")
-
-# =====================================================================
-# VERIFICACIÓN DEL RANKING FIFA
-# =====================================================================
-if os.path.exists("fifa_ranking.json"):
-    print("¡Archivo 'fifa_ranking.json' detectado y listo para usar!")
-else:
-    print("\n[ALERTA] No se encontró 'fifa_ranking.json' en la carpeta.")
-    print("Asegúrate de colocar tu archivo JSON de rankings en la raíz para que data_prep.py funcione.")
