@@ -87,3 +87,68 @@ clean_matches_form_rank.csv: El producto refinado. Es idéntico al CSV original,
 train_model.py: El instructor. Toma el CSV refinado, extrae solo las columnas de brechas (X) y el resultado histórico (y). Configura el clasificador Random Forest, evalúa su rendimiento y guarda ese "cerebro" entrenado en el archivo .pkl.
 
 match_pred.py: El consultor de estrategia. No entrena ni limpia datos. Simplemente toma dos equipos, calcula sus brechas actuales utilizando funciones basadas en el tiempo, consulta al modelo serializado (football_model.pkl) e imprime en la terminal las probabilidades de predicción formateadas.
+
+
+# 🏆 FIFA World Cup 2026 Predictor & Simulator
+
+Un motor de simulación probabilística y matemática diseñado para modelar el desarrollo completo de la Copa Mundial de la FIFA 2026 (formato de 48 equipos).
+
+Este proyecto no es un simple generador de llaves aleatorias. Utiliza un modelo de Machine Learning pre-entrenado para evaluar enfrentamientos directos basándose en datos históricos, estado de forma reciente (form) y la posición actualizada en el Ranking FIFA. Además, resuelve problemas lógicos complejos inherentes al nuevo formato del torneo, como la asignación reglamentaria de los mejores terceros mediante algoritmos de satisfacción de restricciones.
+
+---
+
+## 🔄 Arquitectura y Flujo de Trabajo (Workflow)
+
+El sistema opera bajo un pipeline lineal donde los datos históricos y el modelo estático alimentan al motor de simulación para generar un resultado visual autónomo y dinámico en cada ejecución.
+
+[ Datos Históricos ]         [ Modelo Pre-entrenado ]
+clean_matches_form_rank.csv    football_model.pkl
+             \                     /
+              \                   /
+               v                 v
+        [ Motor de Simulación y Reglas FIFA ]
+                  wc_simulator.py
+                       |
+                       | 1. Simulación Fase de Grupos
+                       | 2. Resolución de Desempates
+                       | 3. Asignación de Terceros (CSP)
+                       | 4. Playoffs (Knockout Stage)
+                       v
+           [ Interfaz Gráfica de Salida ]
+                fixture_mundial.html
+
+### Descripción Funcional de Archivos
+
+* **`clean_matches_form_rank.csv`**: Es la base de datos estructurada. Contiene el historial de partidos internacionales limpios y las métricas calculadas de cada selección (Goles a Favor/En Contra históricos, Puntos, Ranking FIFA y un índice de estado de forma). El script consulta este archivo en tiempo real para obtener las estadísticas base de los equipos antes de simular un cruce.
+* **`football_model.pkl`**: Es el modelo de Machine Learning serializado. Recibe las diferencias estadísticas relativas entre dos equipos (diferencia de ranking, diferencia de goles promedio, diferencia de puntos form) y devuelve una matriz de probabilidades indicando la posibilidad matemática de victoria del equipo A, empate, o victoria del equipo B.
+* **`wc_simulator.py`**: Es el núcleo lógico del proyecto. Orquesta la lectura de datos, invoca al modelo para los 104 partidos correspondientes y aplica estrictamente el reglamento oficial de la FIFA para avanzar de ronda y ordenar las llaves eliminatorias.
+* **`fixture_mundial.html`**: Es el producto final. Un archivo generado dinámicamente con código HTML y CSS inyectado desde Python. Se sobreescribe en cada ejecución para visualizar el bracket interactivo y las tablas de posiciones sin requerir frameworks web externos.
+
+Además...
+* **`macth_pred.py`**: Es el simulador de un partido en particular; se debe ir hasta lo último del archivo para encontrar el método cuyos parametros son los 2 equipos que se desea evaluar en un partido. El resultado se presenta en consola con los datos de PPG (Points per game o puntos por partido) y con el ranking fifa + los puntos de dicho ranking.
+---
+
+## ⚙️ Lógica Interna y Reglas Implementadas
+
+El desarrollo abarca más que la simple predicción binaria, abordando rigurosamente las normativas reglamentarias del mundial:
+
+1.  **Simulación Simétrica para Mitigación de Sesgos:**
+    El motor evalúa cada encuentro dos veces. Intercambia la posición de "Local" y "Visitante" en las entradas del modelo y promedia las matrices de probabilidad resultantes. Esto neutraliza el sesgo de localía que los algoritmos suelen heredar de los datasets históricos de fútbol.
+2.  **Calibración de Empates y Umbrales:**
+    Se utiliza una variable de control `UMBRAL_EMPATE` (configurada en 0.12). Si la diferencia de probabilidades de victoria entre ambos equipos es menor a esta cifra, el partido se decreta empate en tiempo regular. Durante la fase eliminatoria, si un partido termina en empate, se fuerza una resolución lógica por penales basada en la ventaja probabilística residual.
+3.  **Desempates Estrictos (Tie-breakers):**
+    Cuando dos o más selecciones terminan con los mismos puntos, el sistema evita las resoluciones aleatorias implementando el algoritmo oficial de la FIFA: Mayor Diferencia de Goles (DG) > Mayores Goles a Favor (GF) > Desempate por enfrentamientos directos (Head-to-Head).
+4.  **Algoritmo de Satisfacción de Restricciones para Terceros:**
+    El formato de 12 grupos clasifica a los 8 mejores terceros a dieciseisavos de final. Asignarlos en el bracket congelado genera un problema matemático de "callejones sin salida". El código implementa un algoritmo Las Vegas (fuerza bruta con reintentos aleatorios) que procesa miles de permutaciones en milisegundos para garantizar que se cumpla la única regla inquebrantable de la llave: ningún tercero puede enfrentarse al ganador proveniente de su mismo grupo.
+
+---
+
+## 📋 Requisitos e Instalación
+
+Es necesario contar con **Python 3.8+**. Clona este repositorio e instala las dependencias de ciencia de datos requeridas mediante `pip`:
+
+```bash
+pip install pandas numpy joblib scikit-learn;
+
+```
+PD: Tuve problemas con inconsistencias entre nombres en español y en ingles; el resultado se con los paises en ingles pero el codigo contiene ambos idiomas. Esto se debe a las distintas fuentes de donde obtuve los datos.

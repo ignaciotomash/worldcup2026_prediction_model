@@ -1,65 +1,102 @@
 import pandas as pd
 import joblib
-import json
 
-model = joblib.load("football_model.pkl")
-df = pd.read_csv("clean_matches_form_rank.csv")
-df['date'] = pd.to_datetime(df['date'])
+# 1. Cargar modelo y datos unificados
+try:
+    model = joblib.load("football_model.pkl")
+    df = pd.read_csv("clean_matches_form_rank.csv")
+    df['date'] = pd.to_datetime(df['date'])
+    print("Modelo y base de datos cargados con éxito.")
+except Exception as e:
+    print(f"¡Error al cargar archivos esenciales!: {e}")
+    exit()
 
-with open("fifa_ranking.json", "r", encoding="utf-8") as f:
-    fifa_data = json.load(f)["Results"]
+# 2. FUNCIÓN PARA EXTRAER LA INFORMACIÓN MÁS RECIENTE DE UN EQUIPO
+def Gethistoric_data_team(team, dataframe):
+    # Filtrar todos los partidos donde jugó ese equipo
+    team_matches = dataframe[(dataframe['home_team'] == team) | (dataframe['away_team'] == team)]
+    
+    if team_matches.empty:
+        # Valores genéricos de rescate si el equipo no existe en el dataset
+        return 1200.0, 50, 1.0, 1.0, 1.0
+    
+    # Tomar el partido más reciente (última fila por fecha)
+    latest_match = team_matches.sort_values('date').iloc[-1]
+    
+    # Extraer los puntos y el ranking dependiendo de si fue local o visita en ese último partido
+    if latest_match['home_team'] == team:
+        pts = latest_match['home_hist_pts']
+        rank = latest_match['home_rank_pos']
+        form = latest_match['home_form']
+        gf = latest_match['home_gf_avg']
+        ga = latest_match['home_ga_avg']
+    else:
+        pts = latest_match['away_hist_pts']
+        rank = latest_match['away_rank_pos']
+        form = latest_match['away_form']
+        gf = latest_match['away_gf_avg']
+        ga = latest_match['away_ga_avg']
+        
+    return pts, int(rank), form, gf, ga
 
-points_dict = {}
-for team in fifa_data:
-    team_name = next((lang['Description'] for lang in team['TeamName'] if lang['Locale'] == 'en-GB'), None)
-    if team_name:
-        points_dict[team_name] = team['TotalPoints']
-
-def get_current_form_2_years(team, dataframe):
-    last_date = dataframe['date'].max()
-    two_years_ago = last_date - pd.Timedelta(days=730)
-    past_matches = dataframe[(dataframe['date'] >= two_years_ago) & 
-                             ((dataframe['home_team'] == team) | (dataframe['away_team'] == team))]
-    if past_matches.empty:
-        return 1.0
-    total_pts = 0
-    for _, match in past_matches.iterrows():
-        if match['home_team'] == team:
-            total_pts += 3 if match['result'] == 0 else (1 if match['result'] == 1 else 0)
-        else:
-            total_pts += 3 if match['result'] == 2 else (1 if match['result'] == 1 else 0)
-    return total_pts / len(past_matches)
-
+# 3. Predicción simétrica neutral autónoma
 def prediction_neutral(team_a, team_b):
     try:
-        form_a = get_current_form_2_years(team_a, df)
-        form_b = get_current_form_2_years(team_b, df)
-        points_a = points_dict.get(team_a, 1200.0)
-        points_b = points_dict.get(team_b, 1200.0)
+        # Extraer métricas directo desde el CSV de forma automática
+        points_a, rank_a, form_a, gf_a, ga_a = Gethistoric_data_team(team_a, df)
+        points_b, rank_b, form_b, gf_b, ga_b = Gethistoric_data_team(team_b, df)
         
-        # ESCENARIO A: A vs B (Diferencia desde la perspectiva de A)
-        dif_points_a = points_a - points_b
-        dif_form_a = form_a - form_b
-        input_a = pd.DataFrame([[dif_points_a, dif_form_a]], columns=['dif_points', 'dif_form'])
-        prob_a = model.predict_proba(input_a)[0] # [Win_A, Draw, Win_B]
+        # ESCENARIO A: Team A actúa como "Local" en la perspectiva matemática
+        input_a = pd.DataFrame([{
+            'dif_points': points_a - points_b,
+            'dif_form': form_a - form_b,
+            'dif_gf': gf_a - gf_b,
+            'dif_ga': ga_a - ga_b,
+            'dif_ranking_pos': rank_b - rank_a,
+            'neutral': 1
+        }])
+        prob_matrix_a = model.predict_proba(input_a)[0] 
         
-        # ESCENARIO B: B vs A (Diferencia desde la perspectiva de B)
-        dif_points_b = points_b - points_a
-        dif_form_b = form_b - form_a
-        input_b = pd.DataFrame([[dif_points_b, dif_form_b]], columns=['dif_points', 'dif_form'])
-        prob_b = model.predict_proba(input_b)[0] # [Win_B, Draw, Win_A]
+        # ESCENARIO B: Team B actúa como "Local" en la perspectiva matemática
+        input_b = pd.DataFrame([{
+            'dif_points': points_b - points_a,
+            'dif_form': form_b - form_a,
+            'dif_gf': gf_b - gf_a,
+            'dif_ga': ga_b - ga_a,
+            'dif_ranking_pos': rank_a - rank_b,
+            'neutral': 1
+        }])
+        prob_matrix_b = model.predict_proba(input_b)[0]
+
+        # RECONSTRUCCIÓN SIMÉTRICA DE PROBABILIDADES
+        win_a = (prob_matrix_a[1] + (1.0 - prob_matrix_b[1] - (prob_matrix_a[0] * 0.33))) / 2
+        win_b = (prob_matrix_b[1] + (1.0 - prob_matrix_a[1] - (prob_matrix_b[0] * 0.33))) / 2
         
-        # Promediamos para neutralidad absoluta
-        win_a = (prob_a[0] + prob_b[2]) / 2
-        draw = (prob_a[1] + prob_b[1]) / 2
-        win_b = (prob_a[2] + prob_b[0]) / 2
-        
-        highest_prob = max(win_a, draw, win_b)
-        forecast = f"Winner: {team_a}" if highest_prob == win_a else (f"Winner: {team_b}" if highest_prob == win_b else "Draw")
+        win_a = max(0.0, min(1.0, win_a))
+        win_b = max(0.0, min(1.0, win_b))
+        draw = 1.0 - win_a - win_b
+
+        if draw < 0:
+            total = win_a + win_b
+            win_a /= total
+            win_b /= total
+            draw = 0.0
+
+        UMBRAL_EMPATE = 0.12
+        if abs(win_a - win_b) <= UMBRAL_EMPATE:
+            forecast = "Draw (Empate)"
+        elif win_a > win_b:
+            forecast = f"Winner: {team_a}"
+        else:
+            forecast = f"Winner: {team_b}"
         
         print(f"\n======================================")
-        print(f"   NEUTRAL MATCH (GAP MODEL): {team_a} vs {team_b}")
+        print(f"   NEUTRAL MATCH (BINARY GAP): {team_a} vs {team_b}")
         print(f"======================================")
+        print(f"RANKING FIFA ACTUAL:")
+        print(f" - {team_a}: Puesto #{rank_a} ({points_a:.1f} pts)")
+        print(f" - {team_b}: Puesto #{rank_b} ({points_b:.1f} pts)")
+        print(f"--------------------------------------")
         print(f"FORECAST: {forecast}")
         print(f"--------------------------------------")
         print(f"Probabilities:")
@@ -67,12 +104,11 @@ def prediction_neutral(team_a, team_b):
         print(f" - Draw: {draw:.2%}")
         print(f" - {team_b} Win: {win_b:.2%}")
         print(f"======================================")
-        print(f"DEBUG - {team_a}: PPG: {form_a:.2f} | FIFA Points: {points_a:.2f}")
-        print(f"DEBUG - {team_b}: PPG: {form_b:.2f} | FIFA Points: {points_b:.2f}")
-        print(f"DEBUG - BRECHA RANKING: {abs(dif_points_a):.2f} puntos a favor de {team_a if dif_points_a > 0 else team_b}")
+        print(f"DEBUG - {team_a}: PPG Form: {form_a:.2f} | GF Avg: {gf_a:.2f}")
+        print(f"DEBUG - {team_b}: PPG Form: {form_b:.2f} | GF Avg: {gf_b:.2f}")
+        print(f"======================================")
         
     except Exception as e:
-        print(f"Error: {e}")
+        print(f"Error en ejecución: {e}")
 
-# Ejecutamos la prueba del clásico corregido
-prediction_neutral("Argentina", "France")
+prediction_neutral("Mexico", "South Africa")

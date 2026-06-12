@@ -1,0 +1,828 @@
+
+    <!DOCTYPE html>
+    <html>
+    <head>
+        <meta charset="utf-8">
+        <title>Simulador Mundial 2026 - Reporte Completo</title>
+        <style>
+            body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #ffffff; color: #0f172a; padding: 20px; margin: 0; }
+            h1 { text-align: center; color: #0f172a; text-transform: uppercase; letter-spacing: 3px; margin-bottom: 30px; font-size: 28px; font-weight: 800; }
+            h2 { text-align: center; color: #0f172a; text-transform: uppercase; letter-spacing: 2px; margin-top: 60px; margin-bottom: 30px; font-size: 22px; font-weight: 700; }
+            
+            .bracket-outer { display: flex; justify-content: center; align-items: center; min-width: 1400px; padding: 20px; }
+            .side-bracket { display: flex; flex-direction: row; gap: 25px; width: 45%; justify-content: space-between; }
+            
+            .round { display: flex; flex-direction: column; justify-content: space-around; width: 220px; }
+            .round-title { text-align: center; color: #1e40af; font-weight: bold; font-size: 12px; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 10px; border-bottom: 2px solid #1e40af; padding-bottom: 5px; }
+            
+            .match { background: #111e36; border: 1px solid #1e293b; padding: 12px; margin: 10px 0; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.15); font-size: 13px; transition: all 0.3s; }
+            .match:hover { border-color: #3b82f6; transform: scale(1.02); }
+            
+            .team { display: flex; justify-content: space-between; margin: 4px 0; padding: 5px 8px; border-radius: 4px; color: #e2e8f0; }
+            .winner { font-weight: bold; color: #ffffff; background-color: rgba(59, 130, 246, 0.25); border-left: 3px solid #3b82f6; }
+            .loser { color: #94a3b8; }
+            .match-note { text-align: right; font-size: 10px; color: #60a5fa; min-height: 12px; font-weight: bold; }
+            
+            .center-stage { display: flex; flex-direction: column; align-items: center; justify-content: center; width: 300px; gap: 30px; }
+            .final-box { width: 100%; text-align: center; }
+            .final-box .match { background: #1e3a8a; border: 2px solid #d97706; }
+            .final-title { color: #1e3a8a; font-weight: bold; font-size: 16px; letter-spacing: 2px; margin-bottom: 10px; text-transform: uppercase; }
+            
+            .champion-card { text-align: center; background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%); padding: 25px; border-radius: 12px; border: 2px solid #d97706; box-shadow: 0 6px 15px rgba(217,119,6,0.2); width: 90%; }
+            .champion-title { font-size: 12px; color: #b45309; letter-spacing: 3px; font-weight: bold; margin-bottom: 10px; }
+            .champion-name { font-size: 24px; color: #78350f; font-weight: bold; text-transform: uppercase; letter-spacing: 1px; }
+
+            /* --- DISEÑO DE LAS TABLAS DE GRUPOS --- */
+            .groups-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 25px; max-width: 1400px; margin: 0 auto; padding: 20px; }
+            .group-card { background: #ffffff; border: 1px solid #e2e8f0; border-radius: 8px; padding: 15px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); }
+            .group-card-title { text-align: center; color: #1e40af; font-weight: bold; font-size: 14px; margin-bottom: 12px; border-bottom: 2px solid #1e40af; padding-bottom: 4px; text-transform: uppercase; }
+            .group-card table { width: 100%; border-collapse: collapse; font-size: 12px; }
+            .group-card th { background: #111e36; color: #ffffff; padding: 6px; text-align: center; font-weight: 600; }
+            .group-card th:nth-child(2) { text-align: left; }
+            .group-card td { padding: 6px; text-align: center; border-bottom: 1px solid #f1f5f9; color: #334155; }
+            .group-card td.team-name { text-align: left; font-weight: 500; }
+            
+            /* Colores de filas según estado de clasificación */
+            .class-direct { background-color: rgba(59, 130, 246, 0.08); font-weight: bold; }
+            .class-direct td { color: #1e3a8a !important; }
+            .class-third { background-color: rgba(16, 185, 129, 0.08); font-weight: bold; }
+            .class-third td { color: #065f46 !important; }
+            .eliminated { opacity: 0.55; }
+        </style>
+    </head>
+    <body>
+        <h1>🏆 FASE ELIMINATORIA: MUNDIAL 2026 🏆</h1>
+        
+        <div class="bracket-outer">
+            <div class="side-bracket">
+                <div class="round"><div class="round-title">Dieciseisavos</div>
+        <div class="match">
+            <div class="team winner"><span>Germany</span> <span>2</span></div>
+            <div class="team loser"><span>Paraguay</span> <span>1</span></div>
+            <div class="match-note"></div>
+        </div>
+        
+        <div class="match">
+            <div class="team winner"><span>France</span> <span>2</span></div>
+            <div class="team loser"><span>Scotland</span> <span>1</span></div>
+            <div class="match-note"></div>
+        </div>
+        
+        <div class="match">
+            <div class="team loser"><span>South Korea</span> <span>2</span></div>
+            <div class="team winner"><span>Switzerland</span> <span>3</span></div>
+            <div class="match-note"></div>
+        </div>
+        
+        <div class="match">
+            <div class="team winner"><span>Netherlands</span> <span>2</span></div>
+            <div class="team loser"><span>Brazil</span> <span>1</span></div>
+            <div class="match-note"></div>
+        </div>
+        
+        <div class="match">
+            <div class="team winner"><span>Colombia</span> <span>2</span></div>
+            <div class="team loser"><span>Croatia</span> <span>2</span></div>
+            <div class="match-note">(Penales)</div>
+        </div>
+        
+        <div class="match">
+            <div class="team winner"><span>Spain</span> <span>3</span></div>
+            <div class="team loser"><span>Algeria</span> <span>2</span></div>
+            <div class="match-note"></div>
+        </div>
+        
+        <div class="match">
+            <div class="team winner"><span>Australia</span> <span>1</span></div>
+            <div class="team loser"><span>Norway</span> <span>1</span></div>
+            <div class="match-note">(Penales)</div>
+        </div>
+        
+        <div class="match">
+            <div class="team winner"><span>Belgium</span> <span>3</span></div>
+            <div class="team loser"><span>Austria</span> <span>2</span></div>
+            <div class="match-note"></div>
+        </div>
+        </div>
+                <div class="round"><div class="round-title">Octavos</div>
+        <div class="match">
+            <div class="team loser"><span>Germany</span> <span>2</span></div>
+            <div class="team winner"><span>France</span> <span>2</span></div>
+            <div class="match-note">(Penales)</div>
+        </div>
+        
+        <div class="match">
+            <div class="team loser"><span>Switzerland</span> <span>1</span></div>
+            <div class="team winner"><span>Netherlands</span> <span>2</span></div>
+            <div class="match-note"></div>
+        </div>
+        
+        <div class="match">
+            <div class="team loser"><span>Colombia</span> <span>1</span></div>
+            <div class="team winner"><span>Spain</span> <span>2</span></div>
+            <div class="match-note"></div>
+        </div>
+        
+        <div class="match">
+            <div class="team loser"><span>Australia</span> <span>1</span></div>
+            <div class="team winner"><span>Belgium</span> <span>1</span></div>
+            <div class="match-note">(Penales)</div>
+        </div>
+        </div>
+                <div class="round"><div class="round-title">Cuartos</div>
+        <div class="match">
+            <div class="team winner"><span>France</span> <span>1</span></div>
+            <div class="team loser"><span>Netherlands</span> <span>1</span></div>
+            <div class="match-note">(Penales)</div>
+        </div>
+        
+        <div class="match">
+            <div class="team winner"><span>Spain</span> <span>3</span></div>
+            <div class="team loser"><span>Belgium</span> <span>2</span></div>
+            <div class="match-note"></div>
+        </div>
+        </div>
+                <div class="round"><div class="round-title">Semifinal A</div>
+        <div class="match">
+            <div class="team loser"><span>France</span> <span>1</span></div>
+            <div class="team winner"><span>Spain</span> <span>2</span></div>
+            <div class="match-note"></div>
+        </div>
+        </div>
+            </div>
+            
+            <div class="center-stage">
+                <div class="final-box">
+                    <div class="final-title">🔥 GRAN FINAL 🔥</div>
+                    
+        <div class="match">
+            <div class="team loser"><span>Spain</span> <span>2</span></div>
+            <div class="team winner"><span>Argentina</span> <span>2</span></div>
+            <div class="match-note">(Penales)</div>
+        </div>
+        
+                </div>
+                
+                <div class="champion-card">
+                    <div class="champion-title">⭐ CAMPEÓN DEL MUNDO ⭐</div>
+                    <div class="champion-name">Argentina</div>
+                </div>
+            </div>
+            
+            <div class="side-bracket" style="flex-direction: row-reverse;">
+                <div class="round"><div class="round-title">Dieciseisavos</div>
+        <div class="match">
+            <div class="team winner"><span>Morocco</span> <span>2</span></div>
+            <div class="team loser"><span>Japan</span> <span>1</span></div>
+            <div class="match-note"></div>
+        </div>
+        
+        <div class="match">
+            <div class="team loser"><span>Ecuador</span> <span>1</span></div>
+            <div class="team winner"><span>Senegal</span> <span>2</span></div>
+            <div class="match-note"></div>
+        </div>
+        
+        <div class="match">
+            <div class="team winner"><span>Mexico</span> <span>2</span></div>
+            <div class="team loser"><span>Cape Verde</span> <span>1</span></div>
+            <div class="match-note"></div>
+        </div>
+        
+        <div class="match">
+            <div class="team winner"><span>England</span> <span>2</span></div>
+            <div class="team loser"><span>Uzbekistan</span> <span>1</span></div>
+            <div class="match-note"></div>
+        </div>
+        
+        <div class="match">
+            <div class="team winner"><span>Argentina</span> <span>2</span></div>
+            <div class="team loser"><span>Uruguay</span> <span>1</span></div>
+            <div class="match-note"></div>
+        </div>
+        
+        <div class="match">
+            <div class="team loser"><span>Turkey</span> <span>1</span></div>
+            <div class="team winner"><span>Egypt</span> <span>1</span></div>
+            <div class="match-note">(Penales)</div>
+        </div>
+        
+        <div class="match">
+            <div class="team loser"><span>Canada</span> <span>1</span></div>
+            <div class="team winner"><span>Ivory Coast</span> <span>1</span></div>
+            <div class="match-note">(Penales)</div>
+        </div>
+        
+        <div class="match">
+            <div class="team winner"><span>Portugal</span> <span>2</span></div>
+            <div class="team loser"><span>Panama</span> <span>1</span></div>
+            <div class="match-note"></div>
+        </div>
+        </div>
+                <div class="round"><div class="round-title">Octavos</div>
+        <div class="match">
+            <div class="team winner"><span>Morocco</span> <span>2</span></div>
+            <div class="team loser"><span>Senegal</span> <span>1</span></div>
+            <div class="match-note"></div>
+        </div>
+        
+        <div class="match">
+            <div class="team loser"><span>Mexico</span> <span>1</span></div>
+            <div class="team winner"><span>England</span> <span>2</span></div>
+            <div class="match-note"></div>
+        </div>
+        
+        <div class="match">
+            <div class="team winner"><span>Argentina</span> <span>2</span></div>
+            <div class="team loser"><span>Egypt</span> <span>1</span></div>
+            <div class="match-note"></div>
+        </div>
+        
+        <div class="match">
+            <div class="team loser"><span>Ivory Coast</span> <span>1</span></div>
+            <div class="team winner"><span>Portugal</span> <span>2</span></div>
+            <div class="match-note"></div>
+        </div>
+        </div>
+                <div class="round"><div class="round-title">Cuartos</div>
+        <div class="match">
+            <div class="team winner"><span>Morocco</span> <span>2</span></div>
+            <div class="team loser"><span>England</span> <span>2</span></div>
+            <div class="match-note">(Penales)</div>
+        </div>
+        
+        <div class="match">
+            <div class="team winner"><span>Argentina</span> <span>2</span></div>
+            <div class="team loser"><span>Portugal</span> <span>1</span></div>
+            <div class="match-note"></div>
+        </div>
+        </div>
+                <div class="round"><div class="round-title">Semifinal B</div>
+        <div class="match">
+            <div class="team loser"><span>Morocco</span> <span>1</span></div>
+            <div class="team winner"><span>Argentina</span> <span>1</span></div>
+            <div class="match-note">(Penales)</div>
+        </div>
+        </div>
+            </div>
+        </div>
+
+        <h2>📊 TABLAS DE POSICIONES - FASE DE GRUPOS 📊</h2>
+        <div class="groups-grid">
+    
+        <div class="group-card">
+            <div class="group-card-title">Grupo A</div>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Pos</th>
+                        <th>Equipo</th>
+                        <th>PTS</th>
+                        <th>DG</th>
+                        <th>GF</th>
+                    </tr>
+                </thead>
+                <tbody>
+        
+                    <tr class="class-direct">
+                        <td>1</td>
+                        <td class="team-name">Mexico</td>
+                        <td>7</td>
+                        <td>2</td>
+                        <td>5</td>
+                    </tr>
+            
+                    <tr class="class-direct">
+                        <td>2</td>
+                        <td class="team-name">South Korea</td>
+                        <td>7</td>
+                        <td>2</td>
+                        <td>5</td>
+                    </tr>
+            
+                    <tr class="eliminated">
+                        <td>3</td>
+                        <td class="team-name">South Africa</td>
+                        <td>1</td>
+                        <td>-2</td>
+                        <td>3</td>
+                    </tr>
+            
+                    <tr class="eliminated">
+                        <td>4</td>
+                        <td class="team-name">Czech Republic</td>
+                        <td>1</td>
+                        <td>-2</td>
+                        <td>3</td>
+                    </tr>
+            </tbody></table></div>
+        <div class="group-card">
+            <div class="group-card-title">Grupo B</div>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Pos</th>
+                        <th>Equipo</th>
+                        <th>PTS</th>
+                        <th>DG</th>
+                        <th>GF</th>
+                    </tr>
+                </thead>
+                <tbody>
+        
+                    <tr class="class-direct">
+                        <td>1</td>
+                        <td class="team-name">Canada</td>
+                        <td>7</td>
+                        <td>2</td>
+                        <td>5</td>
+                    </tr>
+            
+                    <tr class="class-direct">
+                        <td>2</td>
+                        <td class="team-name">Switzerland</td>
+                        <td>7</td>
+                        <td>2</td>
+                        <td>5</td>
+                    </tr>
+            
+                    <tr class="eliminated">
+                        <td>3</td>
+                        <td class="team-name">Bosnia and Herzegovina</td>
+                        <td>1</td>
+                        <td>-2</td>
+                        <td>4</td>
+                    </tr>
+            
+                    <tr class="eliminated">
+                        <td>4</td>
+                        <td class="team-name">Qatar</td>
+                        <td>1</td>
+                        <td>-2</td>
+                        <td>4</td>
+                    </tr>
+            </tbody></table></div>
+        <div class="group-card">
+            <div class="group-card-title">Grupo C</div>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Pos</th>
+                        <th>Equipo</th>
+                        <th>PTS</th>
+                        <th>DG</th>
+                        <th>GF</th>
+                    </tr>
+                </thead>
+                <tbody>
+        
+                    <tr class="class-direct">
+                        <td>1</td>
+                        <td class="team-name">Morocco</td>
+                        <td>9</td>
+                        <td>3</td>
+                        <td>6</td>
+                    </tr>
+            
+                    <tr class="class-direct">
+                        <td>2</td>
+                        <td class="team-name">Brazil</td>
+                        <td>6</td>
+                        <td>1</td>
+                        <td>6</td>
+                    </tr>
+            
+                    <tr class="class-third">
+                        <td>3</td>
+                        <td class="team-name">Scotland</td>
+                        <td>3</td>
+                        <td>-1</td>
+                        <td>5</td>
+                    </tr>
+            
+                    <tr class="eliminated">
+                        <td>4</td>
+                        <td class="team-name">Haiti</td>
+                        <td>0</td>
+                        <td>-3</td>
+                        <td>5</td>
+                    </tr>
+            </tbody></table></div>
+        <div class="group-card">
+            <div class="group-card-title">Grupo D</div>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Pos</th>
+                        <th>Equipo</th>
+                        <th>PTS</th>
+                        <th>DG</th>
+                        <th>GF</th>
+                    </tr>
+                </thead>
+                <tbody>
+        
+                    <tr class="class-direct">
+                        <td>1</td>
+                        <td class="team-name">Australia</td>
+                        <td>7</td>
+                        <td>2</td>
+                        <td>5</td>
+                    </tr>
+            
+                    <tr class="class-direct">
+                        <td>2</td>
+                        <td class="team-name">Turkey</td>
+                        <td>7</td>
+                        <td>2</td>
+                        <td>5</td>
+                    </tr>
+            
+                    <tr class="class-third">
+                        <td>3</td>
+                        <td class="team-name">Paraguay</td>
+                        <td>3</td>
+                        <td>-1</td>
+                        <td>4</td>
+                    </tr>
+            
+                    <tr class="eliminated">
+                        <td>4</td>
+                        <td class="team-name">United States</td>
+                        <td>0</td>
+                        <td>-3</td>
+                        <td>3</td>
+                    </tr>
+            </tbody></table></div>
+        <div class="group-card">
+            <div class="group-card-title">Grupo E</div>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Pos</th>
+                        <th>Equipo</th>
+                        <th>PTS</th>
+                        <th>DG</th>
+                        <th>GF</th>
+                    </tr>
+                </thead>
+                <tbody>
+        
+                    <tr class="class-direct">
+                        <td>1</td>
+                        <td class="team-name">Germany</td>
+                        <td>9</td>
+                        <td>3</td>
+                        <td>6</td>
+                    </tr>
+            
+                    <tr class="class-direct">
+                        <td>2</td>
+                        <td class="team-name">Ecuador</td>
+                        <td>4</td>
+                        <td>0</td>
+                        <td>4</td>
+                    </tr>
+            
+                    <tr class="class-third">
+                        <td>3</td>
+                        <td class="team-name">Ivory Coast</td>
+                        <td>4</td>
+                        <td>0</td>
+                        <td>4</td>
+                    </tr>
+            
+                    <tr class="eliminated">
+                        <td>4</td>
+                        <td class="team-name">Curacao</td>
+                        <td>0</td>
+                        <td>-3</td>
+                        <td>3</td>
+                    </tr>
+            </tbody></table></div>
+        <div class="group-card">
+            <div class="group-card-title">Grupo F</div>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Pos</th>
+                        <th>Equipo</th>
+                        <th>PTS</th>
+                        <th>DG</th>
+                        <th>GF</th>
+                    </tr>
+                </thead>
+                <tbody>
+        
+                    <tr class="class-direct">
+                        <td>1</td>
+                        <td class="team-name">Netherlands</td>
+                        <td>7</td>
+                        <td>2</td>
+                        <td>6</td>
+                    </tr>
+            
+                    <tr class="class-direct">
+                        <td>2</td>
+                        <td class="team-name">Japan</td>
+                        <td>7</td>
+                        <td>2</td>
+                        <td>5</td>
+                    </tr>
+            
+                    <tr class="eliminated">
+                        <td>3</td>
+                        <td class="team-name">Sweden</td>
+                        <td>1</td>
+                        <td>-2</td>
+                        <td>4</td>
+                    </tr>
+            
+                    <tr class="eliminated">
+                        <td>4</td>
+                        <td class="team-name">Tunisia</td>
+                        <td>1</td>
+                        <td>-2</td>
+                        <td>3</td>
+                    </tr>
+            </tbody></table></div>
+        <div class="group-card">
+            <div class="group-card-title">Grupo G</div>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Pos</th>
+                        <th>Equipo</th>
+                        <th>PTS</th>
+                        <th>DG</th>
+                        <th>GF</th>
+                    </tr>
+                </thead>
+                <tbody>
+        
+                    <tr class="class-direct">
+                        <td>1</td>
+                        <td class="team-name">Belgium</td>
+                        <td>9</td>
+                        <td>3</td>
+                        <td>7</td>
+                    </tr>
+            
+                    <tr class="class-direct">
+                        <td>2</td>
+                        <td class="team-name">Egypt</td>
+                        <td>6</td>
+                        <td>1</td>
+                        <td>6</td>
+                    </tr>
+            
+                    <tr class="eliminated">
+                        <td>3</td>
+                        <td class="team-name">New Zealand</td>
+                        <td>1</td>
+                        <td>-2</td>
+                        <td>5</td>
+                    </tr>
+            
+                    <tr class="eliminated">
+                        <td>4</td>
+                        <td class="team-name">Iran</td>
+                        <td>1</td>
+                        <td>-2</td>
+                        <td>3</td>
+                    </tr>
+            </tbody></table></div>
+        <div class="group-card">
+            <div class="group-card-title">Grupo H</div>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Pos</th>
+                        <th>Equipo</th>
+                        <th>PTS</th>
+                        <th>DG</th>
+                        <th>GF</th>
+                    </tr>
+                </thead>
+                <tbody>
+        
+                    <tr class="class-direct">
+                        <td>1</td>
+                        <td class="team-name">Spain</td>
+                        <td>9</td>
+                        <td>3</td>
+                        <td>6</td>
+                    </tr>
+            
+                    <tr class="class-direct">
+                        <td>2</td>
+                        <td class="team-name">Uruguay</td>
+                        <td>6</td>
+                        <td>1</td>
+                        <td>5</td>
+                    </tr>
+            
+                    <tr class="class-third">
+                        <td>3</td>
+                        <td class="team-name">Cape Verde</td>
+                        <td>3</td>
+                        <td>-1</td>
+                        <td>4</td>
+                    </tr>
+            
+                    <tr class="eliminated">
+                        <td>4</td>
+                        <td class="team-name">Saudi Arabia</td>
+                        <td>0</td>
+                        <td>-3</td>
+                        <td>3</td>
+                    </tr>
+            </tbody></table></div>
+        <div class="group-card">
+            <div class="group-card-title">Grupo I</div>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Pos</th>
+                        <th>Equipo</th>
+                        <th>PTS</th>
+                        <th>DG</th>
+                        <th>GF</th>
+                    </tr>
+                </thead>
+                <tbody>
+        
+                    <tr class="class-direct">
+                        <td>1</td>
+                        <td class="team-name">France</td>
+                        <td>9</td>
+                        <td>3</td>
+                        <td>8</td>
+                    </tr>
+            
+                    <tr class="class-direct">
+                        <td>2</td>
+                        <td class="team-name">Senegal</td>
+                        <td>4</td>
+                        <td>0</td>
+                        <td>6</td>
+                    </tr>
+            
+                    <tr class="class-third">
+                        <td>3</td>
+                        <td class="team-name">Norway</td>
+                        <td>4</td>
+                        <td>0</td>
+                        <td>6</td>
+                    </tr>
+            
+                    <tr class="eliminated">
+                        <td>4</td>
+                        <td class="team-name">Iraq</td>
+                        <td>0</td>
+                        <td>-3</td>
+                        <td>3</td>
+                    </tr>
+            </tbody></table></div>
+        <div class="group-card">
+            <div class="group-card-title">Grupo J</div>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Pos</th>
+                        <th>Equipo</th>
+                        <th>PTS</th>
+                        <th>DG</th>
+                        <th>GF</th>
+                    </tr>
+                </thead>
+                <tbody>
+        
+                    <tr class="class-direct">
+                        <td>1</td>
+                        <td class="team-name">Argentina</td>
+                        <td>9</td>
+                        <td>3</td>
+                        <td>6</td>
+                    </tr>
+            
+                    <tr class="class-direct">
+                        <td>2</td>
+                        <td class="team-name">Algeria</td>
+                        <td>4</td>
+                        <td>0</td>
+                        <td>5</td>
+                    </tr>
+            
+                    <tr class="class-third">
+                        <td>3</td>
+                        <td class="team-name">Austria</td>
+                        <td>4</td>
+                        <td>0</td>
+                        <td>5</td>
+                    </tr>
+            
+                    <tr class="eliminated">
+                        <td>4</td>
+                        <td class="team-name">Jordan</td>
+                        <td>0</td>
+                        <td>-3</td>
+                        <td>3</td>
+                    </tr>
+            </tbody></table></div>
+        <div class="group-card">
+            <div class="group-card-title">Grupo K</div>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Pos</th>
+                        <th>Equipo</th>
+                        <th>PTS</th>
+                        <th>DG</th>
+                        <th>GF</th>
+                    </tr>
+                </thead>
+                <tbody>
+        
+                    <tr class="class-direct">
+                        <td>1</td>
+                        <td class="team-name">Portugal</td>
+                        <td>9</td>
+                        <td>3</td>
+                        <td>6</td>
+                    </tr>
+            
+                    <tr class="class-direct">
+                        <td>2</td>
+                        <td class="team-name">Colombia</td>
+                        <td>6</td>
+                        <td>1</td>
+                        <td>5</td>
+                    </tr>
+            
+                    <tr class="class-third">
+                        <td>3</td>
+                        <td class="team-name">Uzbekistan</td>
+                        <td>3</td>
+                        <td>-1</td>
+                        <td>4</td>
+                    </tr>
+            
+                    <tr class="eliminated">
+                        <td>4</td>
+                        <td class="team-name">DR Congo</td>
+                        <td>0</td>
+                        <td>-3</td>
+                        <td>3</td>
+                    </tr>
+            </tbody></table></div>
+        <div class="group-card">
+            <div class="group-card-title">Grupo L</div>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Pos</th>
+                        <th>Equipo</th>
+                        <th>PTS</th>
+                        <th>DG</th>
+                        <th>GF</th>
+                    </tr>
+                </thead>
+                <tbody>
+        
+                    <tr class="class-direct">
+                        <td>1</td>
+                        <td class="team-name">England</td>
+                        <td>9</td>
+                        <td>3</td>
+                        <td>6</td>
+                    </tr>
+            
+                    <tr class="class-direct">
+                        <td>2</td>
+                        <td class="team-name">Croatia</td>
+                        <td>6</td>
+                        <td>1</td>
+                        <td>5</td>
+                    </tr>
+            
+                    <tr class="class-third">
+                        <td>3</td>
+                        <td class="team-name">Panama</td>
+                        <td>3</td>
+                        <td>-1</td>
+                        <td>4</td>
+                    </tr>
+            
+                    <tr class="eliminated">
+                        <td>4</td>
+                        <td class="team-name">Ghana</td>
+                        <td>0</td>
+                        <td>-3</td>
+                        <td>3</td>
+                    </tr>
+            </tbody></table></div>
+        </div>
+    </body>
+    </html>
+    

@@ -30,7 +30,7 @@ df_clean['home_score'] = df_clean['home_score'].astype(int)
 df_clean['away_score'] = df_clean['away_score'].astype(int)
 df_clean['neutral'] = df_clean['neutral'].astype(bool)
 
-# Crear la columna 'result' (0: Gana Local, 1: Empate, 2: Gana Visitante)
+# Crear la columna 'result' (0: Gana Local, 1: Empate, 2: Gana Visitante): ATENCIÓN, ESTO CAMBIA EN "data_prep.py" para reducir errores probabilisticos por la presencia de la posibilidad de empate
 def determine_result(row):
     if row['home_score'] > row['away_score']:
         return 0
@@ -48,8 +48,6 @@ print("¡Archivo 'clean_matches.csv' generado con éxito!")
 # =====================================================================
 # VERIFICACIÓN DEL RANKING FIFA
 # =====================================================================
-# El archivo fifa_ranking.json requiere credenciales o APIs oficiales de FIFA,
-# por lo que el downloader solo debe verificar si ya lo tienes en la carpeta.
 if os.path.exists("fifa_ranking.json"):
     print("¡Archivo 'fifa_ranking.json' detectado y listo para usar!")
 else:
