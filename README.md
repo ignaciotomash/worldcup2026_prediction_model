@@ -1,99 +1,8 @@
-To try it yourself, go to:
-
-/match_pred.py
-
-and in the bottom of the file, you will find "prediction_neutral(param1,param2)"; thats where you need to put the two countries you want to simulate.
-
-The answer will be in the Terminal! later on I will make it better to see, as in a graphic or something similar.
-
-
------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-
-
-General Concept: File Workflow:
-
-Extraction, Data Preparation/Training, and Prediction.
-
-[ data_downloader.py ] ──> Generates ──> ( clean_matches.csv & fifa_ranking.json )
-                                                        │
-                                                 Passes clean data to
-                                                        │
-                                                        ▼
-[ data_prep.py ] ───────> Generates ──> ( clean_matches_form_rank.csv )
-                                                        │
-                                                    Feeds into
-                                                        │
-                                                        ▼
-[ train_model.py ] ─────> Generates ──> ( football_model.pkl )
-                                                        │
-                                                    Acts as the brain for
-                                                        │
-                                                        ▼
-[ match_pred.py ] ──────> Displays the final result on your screen.
-
-File Breakdown
-
-clean_matches.csv: Raw material. It contains the raw historical data of international football matches (teams, scores, dates, and whether the venue was neutral).
-
-fifa_ranking.json: External JSON from FIFA website; it contains the exact points for each national team according to the latest official FIFA ranking.
-
-data_prep.py: The data processor. It reads the raw CSV and the FIFA JSON, performs complex row-by-row mathematical calculations (the 2-year Points Per Game average for each team), and computes the direct mathematical difference between them (the gaps).
-
-clean_matches_form_rank.csv: The refined product. It is identical to the original CSV but includes the new feature-engineered columns calculated by data_prep.py (dif_points and dif_form). This file is used exclusively to train the model.
-
-train_model.py: The instructor. It takes the refined CSV, extracts only the gap columns (X) and the historical result (y). It configures the Random Forest classifier, evaluates its performance, and saves that trained "brain" into the .pkl file.
-
-match_pred.py: The strategy consultant. It doesn't train or clean data. It simply takes two teams, calculates their current gaps using time-based functions, queries the serialized model (football_model.pkl), and prints the formatted prediction probabilities to the terminal.
-
-
------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-
-Para probarlo por tu cuenta, ve a:
-
-/match_pred.py
-
-en el final del archivo vas a encontrar "prediction_neutral(parametro1,parametro2)"; allí es donde colocas los 2 paises (en ingles) que queres simular.
-
-La respuesta estará en la terminal; en un futuro pretendo mostrar los datos de una forma mas amigable como un grafico.
-
-Concepto General: Flujo de Archivos
-Extracción, Preparación de Datos/Entrenamiento y Predicción.
-
-[ data_downloader.py ] ──> Genera ──> ( clean_matches.csv & fifa_ranking.json )
-                                                       │
-                                                 Pasa los datos limpios a
-                                                       │
-                                                       ▼
-[ data_prep.py ] ───────> Genera ──> ( clean_matches_form_rank.csv )
-                                                       │
-                                                    Alimenta a
-                                                       │
-                                                       ▼
-[ train_model.py ] ─────> Genera ──> ( football_model.pkl )
-                                                       │
-                                                 Actúa como el cerebro de
-                                                       │
-                                                       ▼
-[ match_pred.py ] ──────> Muestra el resultado final en tu pantalla.
-Desglose de Archivos
-clean_matches.csv: La materia prima. Contiene el historial de datos crudos de partidos internacionales de fútbol (equipos, resultados, fechas y si la sede fue neutral).
-
-fifa_ranking.json: JSON externo extraído del sitio web de la FIFA; contiene los puntos exactos de cada selección nacional según el último ranking oficial de la FIFA.
-
-data_prep.py: El procesador de datos. Lee el CSV crudo y el JSON de la FIFA, realiza cálculos matemáticos complejos fila por fila (el promedio de Puntos Por Partido —PPG— de los últimos 2 años para cada equipo) y calcula la diferencia matemática directa entre ambos (las brechas).
-
-clean_matches_form_rank.csv: El producto refinado. Es idéntico al CSV original, pero incluye las nuevas columnas creadas mediante ingeniería de características calculadas por data_prep.py (dif_points y dif_form). Este archivo se utiliza exclusivamente para entrenar el modelo.
-
-train_model.py: El instructor. Toma el CSV refinado, extrae solo las columnas de brechas (X) y el resultado histórico (y). Configura el clasificador Random Forest, evalúa su rendimiento y guarda ese "cerebro" entrenado en el archivo .pkl.
-
-match_pred.py: El consultor de estrategia. No entrena ni limpia datos. Simplemente toma dos equipos, calcula sus brechas actuales utilizando funciones basadas en el tiempo, consulta al modelo serializado (football_model.pkl) e imprime en la terminal las probabilidades de predicción formateadas.
-
-
 # 🏆 FIFA World Cup 2026 Predictor & Simulator
 
 Un motor de simulación probabilística y matemática diseñado para modelar el desarrollo completo de la Copa Mundial de la FIFA 2026 (formato de 48 equipos).
 
-Este proyecto no es un simple generador de llaves aleatorias. Utiliza un modelo de Machine Learning pre-entrenado para evaluar enfrentamientos directos basándose en datos históricos, estado de forma reciente (form) y la posición actualizada en el Ranking FIFA. Además, resuelve problemas lógicos complejos inherentes al nuevo formato del torneo, como la asignación reglamentaria de los mejores terceros mediante algoritmos de satisfacción de restricciones.
+Este proyecto no es un simple generador de llaves aleatorias. Utiliza un modelo de Machine Learning multiclase pre-entrenado para evaluar enfrentamientos directos basándose en datos históricos, estado de forma reciente (form) y la posición actualizada en el Ranking FIFA. Además, incorpora los resultados reales del torneo a medida que se van jugando, y resuelve problemas lógicos complejos inherentes al nuevo formato, como la asignación reglamentaria de los mejores terceros mediante algoritmos de satisfacción de restricciones.
 
 ---
 
@@ -101,56 +10,139 @@ Este proyecto no es un simple generador de llaves aleatorias. Utiliza un modelo 
 
 El sistema opera bajo un pipeline lineal donde los datos históricos y el modelo estático alimentan al motor de simulación para generar un resultado visual autónomo y dinámico en cada ejecución.
 
-[ Datos Históricos ]         [ Modelo Pre-entrenado ]
-clean_matches_form_rank.csv    football_model.pkl
-             \                     /
-              \                   /
-               v                 v
-        [ Motor de Simulación y Reglas FIFA ]
-                  wc_simulator.py
-                       |
-                       | 1. Simulación Fase de Grupos
-                       | 2. Resolución de Desempates
-                       | 3. Asignación de Terceros (CSP)
-                       | 4. Playoffs (Knockout Stage)
-                       v
-           [ Interfaz Gráfica de Salida ]
-                fixture_mundial.html
+```
+[ Datos Históricos ]       [ Rankings FIFA ]
+  clean_matches.csv      fifa_ranking_years/*.json
+          \               /
+           v             v
+      [ Preparación de Datos ]
+           data_prep.py
+                |
+                v
+   clean_matches_form_rank.csv
+                |
+                v
+      [ Entrenamiento del Modelo ]
+           train_model.py
+                |
+                v
+         football_model.pkl
+                |
+                v
+           predictor.py
+          (módulo compartido:
+           simulate_match,
+           get_team_data)
+                |
+                v
+     [ Motor de Simulación y Reglas FIFA ]
+              wc_simulator.py  <----------------- clean_matches.csv
+                   |                        (resultados reales ya jugados)
+                   |                         
+                   |
+                   | 1. Resultados reales del CSV (partidos ya jugados)
+                   | 2. Simulación de partidos pendientes
+                   | 3. Resolución de Desempates FIFA
+                   | 4. Asignación de Terceros (CSP)
+                   | 5. Playoffs (Knockout Stage)
+                   v
+       [ Interfaz Gráfica de Salida ]
+            fixture_mundial.html
+```
 
-### Descripción Funcional de Archivos
+---
 
-* **`clean_matches_form_rank.csv`**: Es la base de datos estructurada. Contiene el historial de partidos internacionales limpios y las métricas calculadas de cada selección (Goles a Favor/En Contra históricos, Puntos, Ranking FIFA y un índice de estado de forma). El script consulta este archivo en tiempo real para obtener las estadísticas base de los equipos antes de simular un cruce.
-* **`football_model.pkl`**: Es el modelo de Machine Learning serializado. Recibe las diferencias estadísticas relativas entre dos equipos (diferencia de ranking, diferencia de goles promedio, diferencia de puntos form) y devuelve una matriz de probabilidades indicando la posibilidad matemática de victoria del equipo A, empate, o victoria del equipo B.
-* **`wc_simulator.py`**: Es el núcleo lógico del proyecto. Orquesta la lectura de datos, invoca al modelo para los 104 partidos correspondientes y aplica estrictamente el reglamento oficial de la FIFA para avanzar de ronda y ordenar las llaves eliminatorias.
-* **`fixture_mundial.html`**: Es el producto final. Un archivo generado dinámicamente con código HTML y CSS inyectado desde Python. Se sobreescribe en cada ejecución para visualizar el bracket interactivo y las tablas de posiciones sin requerir frameworks web externos.
+## 📁 Descripción Funcional de Archivos
 
-* **`run_pipeline`**: Realiza el proceso de descarga, preparacion y entrenamiento con un solo script; basicamente es como ejecutar los 3 scripts que lo hacen por separado pero de una sola ejecución. Se puede ejecutar despues de cada partido para poder actualizar el entrenamiento del modelo.
+### `data_prep.py`
+Procesa el historial de partidos y los rankings FIFA históricos. Calcula las métricas de cada selección (form, goles promedio, puntos FIFA) usando ventanas móviles de 730 días y genera el dataset final `clean_matches_form_rank.csv`. Se puede ejecutar después de cada jornada para incorporar los partidos más recientes al entrenamiento.
 
-Además...
-* **`macth_pred.py`**: Es el simulador de un partido en particular; se debe ir hasta lo último del archivo para encontrar el método cuyos parametros son los 2 equipos que se desea evaluar en un partido. El resultado se presenta en consola con los datos de PPG (Points per game o puntos por partido) y con el ranking fifa + los puntos de dicho ranking.
+### `train_model.py`
+Entrena el modelo de Machine Learning multiclase (**Local gana / Empate / Visitante gana**) usando Random Forest sobre el dataset preparado. Evalúa su rendimiento con métricas detalladas por clase y serializa el modelo entrenado en `football_model.pkl`.
+
+### `football_model.pkl`
+Modelo Random Forest serializado. Recibe las diferencias estadísticas relativas entre dos equipos (ranking, goles promedio, form, puntos FIFA) y devuelve tres probabilidades: victoria equipo A, empate, victoria equipo B.
+
+### `clean_matches_form_rank.csv`
+Dataset estructurado con el historial completo de partidos internacionales enriquecido con métricas calculadas de cada selección. Es la fuente de datos que usa `predictor.py` para extraer el estado actual de cada equipo.
+
+### `predictor.py`
+Módulo central compartido por `match_pred.py` y `wc_simulator.py`. Contiene dos funciones principales:
+- `get_team_data(team)` — extrae las métricas más recientes de un equipo desde el CSV.
+- `simulate_match(team_a, team_b)` — ejecuta la predicción simétrica neutral con el modelo y genera el marcador mediante simulación Monte Carlo con distribución de Poisson. Devuelve outcome, goles y las tres probabilidades.
+
+### `wc_simulator.py`
+Núcleo lógico del torneo. Orquesta la simulación completa del Mundial aplicando estrictamente el reglamento FIFA. Para cada partido de la fase de grupos consulta primero `clean_matches.csv` — si el partido ya se jugó usa el resultado real, si está pendiente lo simula. Genera `fixture_mundial.html` al finalizar.
+
+### `match_pred.py`
+Simulador de partido individual. Importa `predictor.py` y formatea la salida en consola mostrando marcador, pronóstico, probabilidades de los tres resultados y métricas de contexto de ambos equipos. Para simular un partido distinto, editar la última línea del archivo.
+
+### `run_pipeline.py`
+Ejecuta en cadena `data_prep.py` → `train_model.py` en una sola llamada. Recomendado correrlo después de cada jornada del Mundial para actualizar el form y reentrenar el modelo con los partidos más recientes.
+
+### `fixture_mundial.html`
+Producto final generado automáticamente. Visualiza el bracket eliminatorio completo y las 12 tablas de posiciones de grupos en una interfaz HTML interactiva. Se sobreescribe en cada ejecución de `wc_simulator.py`.
+
 ---
 
 ## ⚙️ Lógica Interna y Reglas Implementadas
 
-El desarrollo abarca más que la simple predicción binaria, abordando rigurosamente las normativas reglamentarias del mundial:
+### 1. Modelo Multiclase (Local / Empate / Visitante)
+El modelo Random Forest predice directamente tres probabilidades reales aprendidas de los datos históricos. Esto reemplaza el enfoque binario anterior que solo distinguía "gana local / no gana local" e inventaba los empates con un umbral arbitrario.
 
-1.  **Simulación Simétrica para Mitigación de Sesgos:**
-    El motor evalúa cada encuentro dos veces. Intercambia la posición de "Local" y "Visitante" en las entradas del modelo y promedia las matrices de probabilidad resultantes. Esto neutraliza el sesgo de localía que los algoritmos suelen heredar de los datasets históricos de fútbol.
-2.  **Calibración de Empates y Umbrales:**
-    Se utiliza una variable de control `UMBRAL_EMPATE` (configurada en 0.12). Si la diferencia de probabilidades de victoria entre ambos equipos es menor a esta cifra, el partido se decreta empate en tiempo regular. Durante la fase eliminatoria, si un partido termina en empate, se fuerza una resolución lógica por penales basada en la ventaja probabilística residual.
-3.  **Desempates Estrictos (Tie-breakers):**
-    Cuando dos o más selecciones terminan con los mismos puntos, el sistema evita las resoluciones aleatorias implementando el algoritmo oficial de la FIFA: Mayor Diferencia de Goles (DG) > Mayores Goles a Favor (GF) > Desempate por enfrentamientos directos (Head-to-Head).
-4.  **Algoritmo de Satisfacción de Restricciones para Terceros:**
-    El formato de 12 grupos clasifica a los 8 mejores terceros a dieciseisavos de final. Asignarlos en el bracket congelado genera un problema matemático de "callejones sin salida". El código implementa un algoritmo Las Vegas (fuerza bruta con reintentos aleatorios) que procesa miles de permutaciones en milisegundos para garantizar que se cumpla la única regla inquebrantable de la llave: ningún tercero puede enfrentarse al ganador proveniente de su mismo grupo.
+### 2. Simulación Simétrica para Mitigación de Sesgos
+El motor evalúa cada encuentro dos veces intercambiando la posición de local y visitante en las entradas del modelo, y promedia las probabilidades resultantes. Esto neutraliza el sesgo de localía heredado de los datasets históricos.
+
+### 3. Incorporación de Resultados Reales
+Durante la fase de grupos, el simulador consulta `clean_matches.csv` antes de simular cada partido. Si el partido ya fue jugado (fecha >= 11/06/2026), usa el marcador real directamente. Si está pendiente, lo simula con el modelo. Esto permite correr el simulador en cualquier momento del torneo con la realidad incorporada.
+
+### 4. Marcadores vía Monte Carlo + Poisson
+Para los partidos simulados, se generan 1000 marcadores aleatorios usando distribución de Poisson calibrada con los promedios históricos de goles de cada equipo. Solo se conservan los marcadores que coinciden con el resultado predicho por el modelo, y se toma el promedio como marcador representativo.
+
+### 5. Desempates Estrictos (Tie-breakers)
+Cuando dos o más selecciones terminan con los mismos puntos, el sistema aplica el reglamento oficial de la FIFA en orden:
+
+| Prioridad | Criterio |
+|-----------|----------|
+| 1° | Puntos (PTS) |
+| 2° | Diferencia de Goles (DG) |
+| 3° | Goles a Favor (GF) |
+| 4° | Enfrentamiento Directo H2H (PTS → DG → GF) |
+
+### 6. Algoritmo CSP para Asignación de Terceros
+El formato de 12 grupos clasifica los 8 mejores terceros a dieciseisavos. Asignarlos al bracket congelado respetando que ningún tercero puede enfrentarse al ganador de su mismo grupo es un problema de satisfacción de restricciones. El código lo resuelve con **backtracking y heurística MRV** (Most Restricted Variable) que elige siempre la ranura con menos candidatos válidos disponibles.
 
 ---
 
 ## 📋 Requisitos e Instalación
 
-Es necesario contar con **Python 3.8+**. Clona este repositorio e instala las dependencias de ciencia de datos requeridas mediante `pip`:
+Python 3.8+ requerido. Instalar dependencias:
 
 ```bash
-pip install pandas numpy joblib scikit-learn;
-
+pip install pandas numpy joblib scikit-learn
 ```
-PD: Tuve problemas con inconsistencias entre nombres en español y en ingles; el resultado se con los paises en ingles pero el codigo contiene ambos idiomas. Esto se debe a las distintas fuentes de donde obtuve los datos.
+
+---
+
+## 🚀 Uso
+
+### Flujo completo desde cero
+```bash
+python run_pipeline.py    # prepara datos y entrena modelo
+python wc_simulator.py    # simula el torneo y genera HTML
+```
+
+### Actualizar después de cada jornada
+```bash
+python run_pipeline.py    # incorpora partidos nuevos y reentrena
+python wc_simulator.py    # resimula con resultados reales actualizados
+```
+
+### Predecir un partido puntual
+```bash
+python match_pred.py      # editar la última línea con los equipos deseados
+```
+
+---
+
+> **Nota:** Los nombres de países están en inglés en todo el pipeline. Las fuentes de datos originales estaban en español, por lo que `data_prep.py` incluye un diccionario de traducción `ES_TO_EN` para unificar los nombres antes del procesamiento.

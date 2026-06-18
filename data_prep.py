@@ -10,7 +10,7 @@ ES_TO_EN = {
     "Argelia": "Algeria", "Argentina": "Argentina", "Australia": "Australia", "Austria": "Austria",
     "Bélgica": "Belgium", "Bosnia y Herzegovina": "Bosnia and Herzegovina", "Brasil": "Brazil",
     "Canadá": "Canada", "Cabo Verde": "Cape Verde", "Colombia": "Colombia", "Croacia": "Croatia",
-    "Curazao": "Curacao", "República Checa": "Czech Republic", "RD Congo": "DR Congo", "Ecuador": "Ecuador",
+    "Curazao": "Curaçao", "República Checa": "Czech Republic", "RD Congo": "DR Congo", "Ecuador": "Ecuador",
     "Egipto": "Egypt", "Inglaterra": "England", "Francia": "France", "Alemania": "Germany",
     "Ghana": "Ghana", "Haití": "Haiti", "Irán": "Iran", "Irak": "Iraq", "Costa de Marfil": "Ivory Coast",
     "Japón": "Japan", "Jordania": "Jordan", "México": "Mexico", "Marruecos": "Morocco",
@@ -76,14 +76,19 @@ df['home_rank_pos'] = df['home_rank_pos'].fillna(200.0)
 df['away_rank_pos'] = df['away_rank_pos'].fillna(200.0)
 
 # =====================================================================
-# 4. TRANSFORMACIÓN BINARIA DEL OBJETIVO (OPCIÓN 2)
+# 4. DEFINICIÓN DEL OBJETIVO MULTICLASE
 # =====================================================================
-# Cambiamos el enfoque: 1 si gana el local, 0 si empatan o gana la visita (No gana local, cambio mencionado en data_downloader.py) 
-df['result_binary'] = (df['result'] == 0).astype(int)
+# 'result' ya contiene: 0 = gana local, 1 = empate, 2 = gana visitante
+# No se transforma. Se conserva como target de 3 clases para el modelo.
 
-# Puntos de rendimiento simplificados para la racha de forma
-df['home_perf_pts'] = df['result_binary'] * 3.0
-df['away_perf_pts'] = (df['result'] == 2).astype(float) * 3.0 + (df['result'] == 1).astype(float) * 1.0
+# Puntos de rendimiento para el cálculo de form
+df['home_perf_pts'] = df['result'].map({0: 3.0, 1: 1.0, 2: 0.0})
+df['away_perf_pts'] = df['result'].map({0: 0.0, 1: 1.0, 2: 3.0})
+
+# Bonus para partidos del Mundial 2026 (a partir del 11 de Junio)
+es_mundial = df['date'] >= '2026-06-11'
+df.loc[es_mundial & (df['result'] == 0), 'home_perf_pts'] = 3.4
+df.loc[es_mundial & (df['result'] == 2), 'away_perf_pts'] = 3.4
 
 # =====================================================================
 # 5. RACHAS VECTORIZADAS SÓLIDAS (730 días)
@@ -118,7 +123,6 @@ df['dif_form'] = df['home_form'] - df['away_form']
 df['dif_ranking_pos'] = df['away_rank_pos'] - df['home_rank_pos']
 df['dif_gf'] = df['home_gf_avg'] - df['away_gf_avg']
 df['dif_ga'] = df['home_ga_avg'] - df['away_ga_avg']
-
 df['neutral'] = df['neutral'].astype(int)
 df.to_csv("clean_matches_form_rank.csv", index=False)
-print("¡Proceso completado! Dataset binario generado con éxito.")
+print("¡Proceso completado! Dataset generado con éxito.")

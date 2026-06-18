@@ -1,19 +1,8 @@
 import pandas as pd
-import joblib
 import numpy as np
-import random
-
-# ==========================================
-# 1. CONFIGURACIÓN Y CARGA DE DATOS
-# ==========================================
-try:
-    model = joblib.load("football_model.pkl")
-    df = pd.read_csv("clean_matches_form_rank.csv")
-    df['date'] = pd.to_datetime(df['date'])
-    print(">>> Motor de Predicción y Base de Datos cargados con éxito.\n")
-except Exception as e:
-    print(f"¡Error crítico al cargar archivos esenciales!: {e}")
-    exit()
+import os
+import webbrowser
+from predictor import simulate_match, get_team_data, df
 
 UMBRAL_EMPATE = 0.12
 
@@ -34,63 +23,48 @@ GROUPS = {
 }
 
 # ==========================================
-# 2. FUNCIONES AUXILIARES DEL MOTOR
+# CARGA DE RESULTADOS REALES DEL MUNDIAL
 # ==========================================
-def Gethistoric_data_team(team, dataframe):
-    team_matches = dataframe[(dataframe['home_team'] == team) | (dataframe['away_team'] == team)]
-    if team_matches.empty:
-        return 1200.0, 50, 1.0, 1.0, 1.0
+df_real = pd.read_csv("clean_matches.csv")
+df_real['date'] = pd.to_datetime(df_real['date'])
+
+# Filtramos solo partidos del Mundial 2026 ya jugados
+MUNDIAL_START = pd.Timestamp('2026-06-11')
+df_mundial_real = df_real[df_real['date'] >= MUNDIAL_START].copy()
+
+def get_real_result(team_a, team_b):
+    """
+    Busca si el partido ya se jugó en el CSV real.
+    Devuelve (outcome, goals_a, goals_b) o None si no existe.
+    """
+    # Buscar en ambas orientaciones
+    match = df_mundial_real[
+        ((df_mundial_real['home_team'] == team_a) & (df_mundial_real['away_team'] == team_b)) |
+        ((df_mundial_real['home_team'] == team_b) & (df_mundial_real['away_team'] == team_a))
+    ]
+
+    if match.empty:
+        return None
+
+    row = match.iloc[0]
     
-    latest_match = team_matches.sort_values('date').iloc[-1]
-    if latest_match['home_team'] == team:
-        return (latest_match['home_hist_pts'], int(latest_match['home_rank_pos']), 
-                latest_match['home_form'], latest_match['home_gf_avg'], latest_match['home_ga_avg'])
+    # Determinar orientación
+    if row['home_team'] == team_a:
+        g_a, g_b = int(row['home_score']), int(row['away_score'])
     else:
-        return (latest_match['away_hist_pts'], int(latest_match['away_rank_pos']), 
-                latest_match['away_form'], latest_match['away_gf_avg'], latest_match['away_ga_avg'])
+        g_a, g_b = int(row['away_score']), int(row['home_score'])
 
-def simulate_match(team_a, team_b):
-    """Ejecuta el modelo binario simétrico y devuelve el ganador matemático y goles realistas"""
-    points_a, rank_a, form_a, gf_a, ga_a = Gethistoric_data_team(team_a, df)
-    points_b, rank_b, form_b, gf_b, ga_b = Gethistoric_data_team(team_b, df)
-    
-    input_a = pd.DataFrame([{'dif_points': points_a - points_b, 'dif_form': form_a - form_b, 'dif_gf': gf_a - gf_b, 'dif_ga': ga_a - ga_b, 'dif_ranking_pos': rank_b - rank_a, 'neutral': 1}])
-    prob_matrix_a = model.predict_proba(input_a)[0] 
-    
-    input_b = pd.DataFrame([{'dif_points': points_b - points_a, 'dif_form': form_b - form_a, 'dif_gf': gf_b - gf_a, 'dif_ga': ga_b - ga_a, 'dif_ranking_pos': rank_a - rank_b, 'neutral': 1}])
-    prob_matrix_b = model.predict_proba(input_b)[0]
-
-    win_a = (prob_matrix_a[1] + (1.0 - prob_matrix_b[1] - (prob_matrix_a[0] * 0.33))) / 2
-    win_b = (prob_matrix_b[1] + (1.0 - prob_matrix_a[1] - (prob_matrix_b[0] * 0.33))) / 2
-    
-    win_a = max(0.0, min(1.0, win_a))
-    win_b = max(0.0, min(1.0, win_b))
-    
-    # Determinación del resultado por Umbral Calibrado
-    if abs(win_a - win_b) <= UMBRAL_EMPATE:
-        outcome = "DRAW"
-    elif win_a > win_b:
+    if g_a > g_b:
         outcome = team_a
-    else:
+    elif g_b > g_a:
         outcome = team_b
-
-    # Generación de Goles basados en GF/GA históricos simulados
-    base_goals_a = max(0, int(round((gf_a + ga_b) / 2)))
-    base_goals_b = max(0, int(round((gf_b + ga_a) / 2)))
-    
-    if outcome == "DRAW":
-        goals_a = goals_b = base_goals_a
-    elif outcome == team_a:
-        goals_a = max(base_goals_a, base_goals_b + 1)
-        goals_b = base_goals_b
     else:
-        goals_b = max(base_goals_b, base_goals_a + 1)
-        goals_a = base_goals_a
+        outcome = "DRAW"
 
-    return outcome, goals_a, goals_b, win_a, win_b
+    return outcome, g_a, g_b
 
 # ==========================================
-# 3. SIMULACIÓN DE LA FASE DE GRUPOS Y DESEMPATES
+#  SIMULACIÓN DE LA FASE DE GRUPOS Y DESEMPATES
 # ==========================================
 
 def resolve_tiebreakers(table, match_history):
@@ -161,7 +135,14 @@ for group_name, teams in GROUPS.items():
     for i in range(len(teams)):
         for j in range(i + 1, len(teams)):
             team_a, team_b = teams[i], teams[j]
-            outcome, g_a, g_b, _, _ = simulate_match(team_a, team_b)
+
+            # Usar resultado real si ya se jugó, sino simular
+            real = get_real_result(team_a, team_b)
+            if real:
+                outcome, g_a, g_b = real
+                print(f"[REAL] {team_a} {g_a} - {g_b} {team_b}")
+            else:
+                outcome, g_a, g_b, _, _, _ = simulate_match(team_a, team_b)
             
             # Guardar en el historial del grupo
             match_history.append({
@@ -217,7 +198,7 @@ detailed_thirds = []
 for group_name, table in group_tables.items():
     third_team = table.index[2]
     # Extraemos el ranking FIFA actual del equipo para usarlo como desempate avanzado
-    _, rank_pos, _, _, _ = Gethistoric_data_team(third_team, df)
+    _, rank_pos, _, _, _ = get_team_data(third_team)
     
     stats = table.loc[third_team].copy()
     stats['team'] = third_team
@@ -252,9 +233,6 @@ print(f"SELECCIONES TOTALES CLASIFICADAS A PLAYOFFS ({len(qualified_teams)} Equi
 print("==================================================")
 print(", ".join(qualified_teams))
 
-import os
-import webbrowser
-
 # ==========================================
 # 5. SIMULACIÓN DE LLAVES Y GENERACIÓN HTML
 # ==========================================
@@ -269,7 +247,7 @@ def simulate_knockout_stage(matchups, stage_name):
     matches_info = []
     
     for t1, t2 in matchups:
-        outcome, g_a, g_b, p_a, p_b = simulate_match(t1, t2)
+        outcome, g_a, g_b, p_a, _, p_b = simulate_match(t1, t2)
         if outcome == "DRAW":
             winner = t1 if p_a > p_b else t2
             print(f"[{stage_name}] {t1} {g_a} - {g_b} {t2} -> Empate. ¡Ganador por Penales!: {winner}")
@@ -584,7 +562,7 @@ finalists = simulate_knockout_stage([(winners_quarters[i], winners_quarters[i+1]
 print("\n==================================================")
 print("                ¡GRAN FINAL DEL MUNDO!            ")
 print("==================================================")
-campeon, g_a, g_b, p_a, p_b = simulate_match(finalists[0], finalists[1])
+campeon, g_a, g_b, p_a, _, p_b = simulate_match(finalists[0], finalists[1])
 
 if campeon == "DRAW":
     campeon = finalists[0] if p_a > p_b else finalists[1]
